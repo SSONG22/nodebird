@@ -27,7 +27,7 @@ import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 import shortid from "shortid";
 
 function loadPostsAPI(data) {
-  return axios.get("/posts", data);
+  return axios.get("/posts");
 }
 
 function* loadPosts(action) {
@@ -39,9 +39,10 @@ function* loadPosts(action) {
       // data: generateDummyPost(10),
     });
   } catch (error) {
+    console.error(error);
     yield put({
       type: LOAD_POSTS_FAILURE,
-      data: error.response.data,
+      data: error,
     });
   }
 }
@@ -125,6 +126,7 @@ function* addComment(action) {
       data: result.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
       data: err.response.data,

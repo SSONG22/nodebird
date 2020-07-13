@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
     }
   );
-  Post.associatate = (db) => {
+  Post.associate = (db) => {
     db.Post.belongsTo(db.User); //작성자한테 속해있다
     db.Post.hasMany(db.Comment); //포스트 하나에 댓글 여러개
     db.Post.hasMany(db.Image);

@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       collate: "utf8mb4_general_ci", //한글임티 저장
     }
   );
-  Comment.associatate = (db) => {
+  Comment.associate = (db) => {
     db.Comment.belongsTo(db.User);
     db.Comment.belongsTo(db.Post); //belongsTo 의 역할
   };
