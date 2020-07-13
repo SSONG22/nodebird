@@ -1,13 +1,12 @@
 const express = require("express");
 
 const { Post, User, Image, Comment } = require("../models");
-
 const router = express.Router();
 
+//GET /posts
 router.get("/", async (req, res, next) => {
   // console.log(User, Image);
   try {
-    //GET /posts
     const where = {};
     const posts = await Post.findAll({
       where,
@@ -29,6 +28,11 @@ router.get("/", async (req, res, next) => {
               attributes: ["id", "nickname"],
             },
           ],
+        },
+        {
+          model: User,
+          as: "Likers",
+          attributes: ["id", "nickname"],
         },
       ],
     });

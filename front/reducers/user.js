@@ -23,6 +23,9 @@ export const initialState = {
   loadMyInfoLoading: false,
   loadMyInfoDone: false,
   loadMyInfoError: null,
+  changeNicknameLoading: false,
+  changeNicknameDone: false,
+  changeNicknameError: null,
 };
 
 //action
@@ -52,6 +55,10 @@ export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
 export const LOAD_MY_INFO_REQUEST = "LOAD_MY_INFO_REQUEST";
 export const LOAD_MY_INFO_SUCCESS = "LOAD_MY_INFO_SUCCESS";
 export const LOAD_MY_INFO_FAILURE = "LOAD_MY_INFO_FAILURE";
+
+export const CHANGE_NICKNAME_REQUEST = "CHANGE_NICKNAME_REQUEST";
+export const CHANGE_NICKNAME_SUCCESS = "CHANGE_NICKNAME_SUCCESS";
+export const CHANGE_NICKNAME_FAILURE = "CHANGE_NICKNAME_FAILURE";
 
 // const dummyUser = (data) => ({
 //   ...data,
@@ -178,7 +185,22 @@ const reducer = (state = initialState, action) =>
         draft.signUpLoading = false;
         draft.signUpError = action.data;
         break;
-
+      case CHANGE_NICKNAME_REQUEST:
+        draft.changeNicknameDone = false;
+        draft.changeNicknameLoading = true;
+        draft.changeNicknameError = null;
+        break;
+      case CHANGE_NICKNAME_SUCCESS:
+        draft.me.nickname = action.data.nickname;
+        draft.changeNicknameDone = true;
+        draft.changeNicknameLoading = false;
+        draft.changeNicknameError = null;
+        break;
+      case CHANGE_NICKNAME_FAILURE:
+        draft.changeNicknameDone = false;
+        draft.changeNicknameLoading = false;
+        draft.changeNicknameError = action.data;
+        break;
       case ADD_POST_TO_ME:
         draft.me.Posts.unshift({ id: action.data });
         break;

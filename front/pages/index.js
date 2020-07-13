@@ -39,9 +39,9 @@ const Home = () => {
         document.documentElement.scrollHeight - 300
       )
         if (hasMorePosts && !loadPostsLoading) {
-          dispatch({
-            type: LOAD_POSTS_REQUEST,
-          });
+          // dispatch({
+          //   type: LOAD_POSTS_REQUEST,
+          // });
         }
     }
     window.addEventListener("scroll", onScroll);
@@ -56,7 +56,6 @@ const Home = () => {
       {mainPosts.map((post, index) => (
         <PostCard key={index} post={post} />
       ))}
-      <div>Hello, Next!</div>
     </AppLayout>
   );
 };
