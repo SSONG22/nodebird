@@ -36,13 +36,13 @@ const PostCard = ({ post }) => {
       type: LIKE_POST_REQUEST,
       data: post.id,
     });
-  }, []);
+  }, [post]);
   const onUnLike = useCallback(() => {
     dispatch({
       type: UNLIKE_POST_REQUEST,
       data: post.id,
     });
-  }, []);
+  }, [post]);
 
   const onToggleComment = useCallback(() => {
     setCommentFormOpened((prev) => !prev);

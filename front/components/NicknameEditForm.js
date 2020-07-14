@@ -11,7 +11,7 @@ const NicknameEditForm = () => {
   const onSubmit = useCallback(() => {
     dispatch({
       type: CHANGE_NICKNAME_REQUEST,
-      data: nickname,
+      data: { nickname: nickname },
     });
   }, [nickname]);
 
@@ -20,6 +20,7 @@ const NicknameEditForm = () => {
     border: "1px solid #d9d9d9",
     padding: "10px",
   }));
+
   return (
     <Form style={style}>
       <Input.Search

@@ -26,6 +26,13 @@ export const initialState = {
   changeNicknameLoading: false,
   changeNicknameDone: false,
   changeNicknameError: null,
+
+  loadFollowersLoading: false,
+  loadFollowersDone: false,
+  loadFollowersError: null,
+  loadFollowingsLoading: false,
+  loadFollowingsDone: false,
+  loadFollowingsError: null,
 };
 
 //action
@@ -60,6 +67,14 @@ export const CHANGE_NICKNAME_REQUEST = "CHANGE_NICKNAME_REQUEST";
 export const CHANGE_NICKNAME_SUCCESS = "CHANGE_NICKNAME_SUCCESS";
 export const CHANGE_NICKNAME_FAILURE = "CHANGE_NICKNAME_FAILURE";
 
+export const LOAD_FOLLOWERS_REQUEST = "LOAD_FOLLOWERS_REQUEST";
+export const LOAD_FOLLOWERS_SUCCESS = "LOAD_FOLLOWERS_SUCCESS";
+export const LOAD_FOLLOWERS_FAILURE = "LOAD_FOLLOWERS_FAILURE";
+
+export const LOAD_FOLLOWINGS_REQUEST = "LOAD_FOLLOWINGS_REQUEST";
+export const LOAD_FOLLOWINGS_SUCCESS = "LOAD_FOLLOWINGS_SUCCESS";
+export const LOAD_FOLLOWINGS_FAILURE = "LOAD_FOLLOWINGS_FAILURE";
+
 // const dummyUser = (data) => ({
 //   ...data,
 //   nickname: "chee99",
@@ -86,6 +101,39 @@ export const logoutRequestAction = () => {
 const reducer = (state = initialState, action) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_FOLLOWERS_REQUEST:
+        draft.loadFollowersDone = false;
+        draft.loadFollowersLoading = true;
+        draft.loadFollowersError = null;
+        break;
+      case LOAD_FOLLOWERS_SUCCESS:
+        draft.me.Followers = action.data;
+        draft.loadFollowersDone = true;
+        draft.loadFollowersLoading = false;
+        draft.loadFollowersError = null;
+        break;
+      case LOAD_FOLLOWERS_FAILURE:
+        draft.loadFollowersDone = false;
+        draft.loadFollowersLoading = false;
+        draft.loadFollowersError = action.data;
+        break;
+
+      case LOAD_FOLLOWINGS_REQUEST:
+        draft.loadFollowingsDone = false;
+        draft.loadFollowingsLoading = true;
+        draft.loadFollowingsError = null;
+        break;
+      case LOAD_FOLLOWINGS_SUCCESS:
+        draft.me.Followings = action.data;
+        draft.loadFollowingsDone = true;
+        draft.loadFollowingsLoading = false;
+        draft.loadFollowingsError = null;
+        break;
+      case LOAD_FOLLOWINGS_FAILURE:
+        draft.loadFollowingsDone = false;
+        draft.loadFollowingsLoading = false;
+        draft.loadFollowingsError = action.data;
+        break;
       case LOAD_MY_INFO_REQUEST:
         draft.loadMyInfoLoading = true;
         draft.loadMyInfoDone = false;
@@ -110,7 +158,7 @@ const reducer = (state = initialState, action) =>
       case FOLLOW_SUCCESS:
         draft.followLoading = false;
         draft.followDone = true;
-        draft.me.Followings.push({ id: action.data });
+        draft.me.Followings.push({ id: action.data.UserId });
         break;
       case FOLLOW_FAILURE:
         draft.followLoading = false;
@@ -127,7 +175,7 @@ const reducer = (state = initialState, action) =>
         draft.followLoading = false;
         draft.followDone = true;
         draft.me.Followings = draft.me.Followings.filter(
-          (v) => v.id !== action.data,
+          (v) => v.id !== action.data.UserId,
         );
         break;
       case UNFOLLOW_FAILURE:
@@ -205,7 +253,9 @@ const reducer = (state = initialState, action) =>
         draft.me.Posts.unshift({ id: action.data });
         break;
       case REMOVE_POST_OF_ME:
-        draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
+        draft.me.Posts = draft.me.Posts.filter(
+          (v) => v.id !== action.data.PostId,
+        );
         break;
       default:
         break;

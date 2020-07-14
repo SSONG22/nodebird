@@ -25,6 +25,8 @@ const FollowButton = ({ post }) => {
       });
     }
   }, [isFollowing]);
+
+  if (post.User.id === me.id) return null;
   return (
     // eslint-disable-next-line react/react-in-jsx-scope
     <Button loading={followLoading || unfollowLoading} onClick={onClickButton}>
