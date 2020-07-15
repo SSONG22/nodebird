@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       collate: "utf8_general_ci", //한글임티 저장
     }
   );
-  Image.associatate = (db) => {
+  Image.associate = (db) => {
     db.Image.belongsTo(db.Post); // 1:다
   };
   return Image;
