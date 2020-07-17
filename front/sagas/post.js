@@ -31,10 +31,14 @@ import {
   UPLOAD_IMAGES_REQUEST,
   UPLOAD_IMAGES_SUCCESS,
   UPLOAD_IMAGES_FAILURE,
+  RETWEET_REQUEST,
+  RETWEET_FAILURE,
+  RETWEET_SUCCESS,
 } from "../reducers/post";
 import axios from "axios";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 import shortid from "shortid";
+import { func } from "prop-types";
 
 function loadPostsAPI(data) {
   return axios.get("/posts");
@@ -203,6 +207,26 @@ function* uploadImages(action) {
 function* watchUploadImages() {
   yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
+function retweetAPI(data) {
+  return axios.post(`/post/${data}/retweet`);
+}
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: RETWEET_FAILURE,
+      data: error.response.data,
+    });
+  }
+}
+function* watchRetweet() {
+  yield takeLatest(RETWEET_REQUEST, retweet);
+}
 export default function* postSaga() {
   yield all([
     fork(watchAddPost),
@@ -212,5 +236,6 @@ export default function* postSaga() {
     fork(watchLikePost),
     fork(watchUnlikePost),
     fork(watchUploadImages),
+    fork(watchRetweet),
   ]);
 }

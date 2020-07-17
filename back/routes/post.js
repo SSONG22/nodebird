@@ -175,4 +175,83 @@ router.post("/images", isLoggedIn, upload.array("image"), (req, res, next) => {
   res.json(req.files.map((v) => v.filename));
 });
 
+router.post("/:postId/retweet", isLoggedIn, async (req, res, next) => {
+  //POST /post/1/retweet
+  try {
+    //존재하지 않는 게시글에 댓글을 달때
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+      include: [
+        {
+          model: Post,
+          as: "Retweet",
+        },
+      ],
+    });
+    if (!post) return res.status(403).send("존재하지 않는 게시글입니다"); //응답 1번이어야 해서 return 붙여야함
+    if (
+      req.user.id === post.UserId ||
+      (post.Retweet && post.Retweet.UserId === req.user.id)
+    ) {
+      //자기게시글 리트윗, 자기게시글리트윗한걸 다시 리트윗하는걸 막음
+      return res.status(403).send("자신의 글은 리트윗 할 수 없습니다");
+    }
+    const retweetTargetId = post.RetweetId || post.id;
+    const exPost = await Post.findOne({
+      where: {
+        UserId: req.user.id,
+        RetweetId: retweetTargetId,
+      },
+    });
+    if (exPost) return res.status(403).send("이미 리트윗 했습니다");
+
+    const retweet = await Post.create({
+      UserId: req.user.id,
+      RetweetId: retweetTargetId,
+      content: "retweet",
+    });
+    const retweetWithPrevPost = await Post.findOne({
+      where: { id: retweet.id },
+      include: [
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ["id", "nickname"],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "Likers",
+          attributes: ["id", "nickname"],
+        },
+      ],
+    });
+    res.status(201).json(retweetWithPrevPost);
+  } catch (error) {
+    next(err);
+  }
+});
 module.exports = router;
