@@ -5,7 +5,7 @@ const multer = require("multer");
 const path = require("path"); //node module
 const fs = require("fs");
 
-const { Post, User, Image, Comment } = require("../models");
+const { Post, User, Image, Comment, Hashtag } = require("../models");
 const { isLoggedIn } = require("./middleware");
 
 try {
@@ -15,14 +15,53 @@ try {
   fs.mkdirSync("uploads");
 }
 
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, "uploads");
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname); // 확장자 추출 .png
+      const basename = path.basename(file.originalname, ext); // 파일 이름
+
+      done(null, basename + new Date().getTime() + ext);
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+});
+
 //post가 공통적
-router.post("/", isLoggedIn, async (req, res, next) => {
+router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   //POST / post
   try {
+    const hashtags = req.body.content.match(/#[^\s]+/g);
     const post = await Post.create({
       content: req.body.content,
       UserId: req.user.id,
     });
+    if (hashtags) {
+      const result = await Promise.all(
+        hashtags.map((tag) =>
+          Hashtag.findOrCreate({
+            where: { name: tag.slice(1).toLowerCase() }, // 소문자 저장
+          })
+        )
+      ); // [[#노드, true], [#리액트, ture]] 이런 모양이라서..
+      await post.addHashtags(result.map((v) => v[0])); // 첫번째 배열만 추출
+    }
+    if (req.body.image) {
+      if (Array.isArray(req.body.image)) {
+        // 이미지를 여러 개 올리면 image: [1.png, 2.png]
+        const images = await Promise.all(
+          req.body.image.map((image) => Image.create({ src: image }))
+        );
+        await post.addImages(images);
+      } else {
+        // 이미지를 하나만 올리면 image : 1.png
+        const image = await Image.create({ src: req.body.image });
+        await post.addImages(image);
+      }
+    }
     const fullPost = await Post.findOne({
       where: { id: post.id },
       include: [
@@ -128,21 +167,6 @@ router.delete("/:postId/unlike", isLoggedIn, async (req, res, next) => {
     console.error(error);
     next(error);
   }
-});
-
-const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, "uploads");
-    },
-    filename(req, file, done) {
-      const ext = path.extname(file.originalname); // 확장자 추출 .png
-      const basename = path.basename(file.originalname, ext); // 파일 이름
-
-      done(null, basename + new Date().getTime() + ext);
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
 });
 
 router.post("/images", isLoggedIn, upload.array("image"), (req, res, next) => {

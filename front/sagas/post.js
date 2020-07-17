@@ -62,24 +62,15 @@ function* watchLoadPosts() {
 }
 
 function addPostAPI(data) {
-  return axios.post(
-    "http://localhost:3065/post",
-    { content: data },
-    {
-      withCredentials: true,
-    },
-  );
+  return axios.post("http://localhost:3065/post", data);
 }
 function* addPost(action) {
-  console.log("addpost");
   try {
     const result = yield call(addPostAPI, action.data);
-    // const id = shortid.generate()
     yield put({
       type: ADD_POST_TO_ME,
       data: result.data.id,
     });
-    console.log(result.data);
     yield put({
       type: ADD_POST_SUCCESS,
       data: result.data,
