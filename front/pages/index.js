@@ -32,7 +32,6 @@ const Home = () => {
     });
     dispatch({
       type: LOAD_POSTS_REQUEST,
-      data: 10,
     });
   }, []);
 
@@ -43,21 +42,25 @@ const Home = () => {
       //   document.documentElement.clientHeight, //화면에 보이는 부분
       //   document.documentElement.scrollHeight,
       // );
+
       if (
         window.scrollY + document.documentElement.clientHeight >
         document.documentElement.scrollHeight - 300
       )
         if (hasMorePosts && !loadPostsLoading) {
-          // dispatch({
-          //   type: LOAD_POSTS_REQUEST,
-          // });
+          const lastId = mainPosts[mainPosts.length - 1]?.id;
+
+          dispatch({
+            type: LOAD_POSTS_REQUEST,
+            lastId,
+          });
         }
     }
     window.addEventListener("scroll", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, [hasMorePosts, loadPostsLoading]);
+  }, [hasMorePosts, loadPostsLoading, mainPosts]);
 
   return (
     <AppLayout>

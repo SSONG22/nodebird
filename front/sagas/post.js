@@ -38,15 +38,15 @@ import {
 import axios from "axios";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 import shortid from "shortid";
-import { func } from "prop-types";
 
-function loadPostsAPI(data) {
-  return axios.get("/posts");
+function loadPostsAPI(lastId) {
+  console.log(lastId);
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
 function* loadPosts(action) {
   try {
-    const result = yield call(loadPostsAPI, action.data);
+    const result = yield call(loadPostsAPI, action.lastId);
     yield put({
       type: LOAD_POSTS_SUCCESS,
       data: result.data,
