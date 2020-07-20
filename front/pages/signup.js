@@ -5,10 +5,13 @@ import { useCallback, useState } from "react";
 import styled from "styled-components";
 import useInput from "../hooks/useInput";
 import { Form, Input, Checkbox, Button } from "antd";
-import { SIGN_UP_REQUEST } from "../reducers/user";
+import { SIGN_UP_REQUEST, LOAD_MY_INFO_REQUEST } from "../reducers/user";
 import { useDispatch, useSelector } from "react-redux";
 import Router from "next/router";
 import { useEffect } from "react";
+import wrapper from "../store/configureStore";
+import axios from "axios";
+import { END } from "redux-saga";
 
 const FormWrapper = styled(Form)`
   padding: 10px;
@@ -67,6 +70,7 @@ const SignUp = () => {
       data: { email, nickname, password },
     });
   }, [email, password, passwordCheck, term]);
+
   return (
     <AppLayout>
       <Head>
@@ -132,5 +136,21 @@ const SignUp = () => {
     </AppLayout>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps(
+  async (context) => {
+    const cookie = context.req ? context.req.headers.cookie : "";
+    axios.defaults.headers.Cookie = "";
+    if (context.req && cookie) {
+      axios.defaults.headers.Cookie = cookie;
+    }
+    context.store.dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
+
+    context.store.dispatch(END);
+    await context.store.sagaTask.toPromise();
+  },
+); // 화면을 그리기전에 서버쪽에서 먼저 실행
 
 export default SignUp;

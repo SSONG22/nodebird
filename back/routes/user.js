@@ -9,6 +9,7 @@ const router = express.Router();
 
 //GET /user
 router.get("/", async (req, res, next) => {
+  console.log(req.headers);
   try {
     if (req.user) {
       const fullUserWithoutPassword = await User.findOne({
@@ -39,6 +40,43 @@ router.get("/", async (req, res, next) => {
     }
   } catch (error) {
     console.error("get user error", error);
+    next(error);
+  }
+});
+
+router.get("/:userId", async (req, res, next) => {
+  try {
+    const fullUserWithoutPassword = await User.findOne({
+      where: { id: req.params.userId },
+      attributes: {
+        exclude: ["password"], //비밀번호만 빼겠다.
+      },
+      include: [
+        {
+          model: Post,
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followings",
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followers",
+          attributes: ["id"],
+        },
+      ],
+    });
+    if (fullUserWithoutPassword) {
+      const data = fullUserWithoutPassword.toJSON();
+      data.Posts = data.Posts.length;
+      data.Followers = data.Followers.length;
+      data.Followings = data.Followings.length;
+      res.status(200).json(data); //개인정보 침해 예방
+    } else res.status(404).json("존재하지않는 사용자 입니다.");
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 });

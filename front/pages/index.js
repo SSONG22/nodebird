@@ -2,12 +2,14 @@
 
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
+import { END } from "redux-saga";
 import AppLayout from "../components/AppLayout";
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
 import { LOAD_MY_INFO_REQUEST } from "../reducers/user";
 import { LOAD_POSTS_REQUEST } from "../reducers/post";
+import wrapper from "../store/configureStore";
+import axios from "axios";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -26,14 +28,14 @@ const Home = () => {
     }
   }, [retweetError]);
 
-  useEffect(() => {
-    dispatch({
-      type: LOAD_MY_INFO_REQUEST,
-    });
-    dispatch({
-      type: LOAD_POSTS_REQUEST,
-    });
-  }, []);
+  // useEffect(() => {
+  // dispatch({
+  //   type: LOAD_MY_INFO_REQUEST,
+  // });
+  // dispatch({
+  //   type: LOAD_POSTS_REQUEST,
+  // });
+  // }, []);
 
   useEffect(() => {
     function onScroll() {
@@ -72,4 +74,21 @@ const Home = () => {
   );
 };
 
+export const getServerSideProps = wrapper.getServerSideProps(
+  async (context) => {
+    const cookie = context.req ? context.req.headers.cookie : "";
+    axios.defaults.headers.Cookie = "";
+    if (context.req && cookie) {
+      axios.defaults.headers.Cookie = cookie;
+    }
+    context.store.dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
+    context.store.dispatch({
+      type: LOAD_POSTS_REQUEST,
+    });
+    context.store.dispatch(END);
+    await context.store.sagaTask.toPromise();
+  },
+); // 화면을 그리기전에 서버쪽에서 먼저 실행
 export default Home;

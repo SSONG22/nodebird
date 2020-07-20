@@ -4,19 +4,20 @@ import post from "./post";
 import { combineReducers } from "redux";
 
 // (이전상태, 액션) => 다음상태
-const rootReducer = combineReducers({
-  index: (state = {}, action) => {
-    switch (action.type) {
-      case HYDRATE:
-        console.log("HYDRATE", action);
-        return { ...state, ...action.payload };
-
-      default:
-        return state;
+const rootReducer = (state, action) => {
+  switch (action.type) {
+    case HYDRATE:
+      return action.payload;
+    default: {
+      const combineReducer = combineReducers({
+        user,
+        post,
+      });
+      return combineReducer(state, action);
     }
-  }, //hydrate(ssr) 을 위해 index 리듀서 추가
-  user,
-  post,
-});
-
+  }
+};
+// const rootReducer = combinReducers({
+// user,post
+// }) 와 똑같다, 확장한느낌..
 export default rootReducer;

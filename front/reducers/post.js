@@ -8,9 +8,16 @@ export const initialState = {
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
+
   loadPostsLoading: false,
   loadPostsDone: false,
   loadPostsError: null,
+
+  singlePost: null,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
+
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -68,6 +75,10 @@ export const initialState = {
 // initialState.mainPosts = initialState.mainPosts.concat(generateDummyPost(10));
 
 // action //상수로 빼주면 재활용할 수 있다.
+export const LOAD_POST_REQUEST = "LOAD_POST_REQUEST";
+export const LOAD_POST_SUCCESS = "LOAD_POST_SUCCESS";
+export const LOAD_POST_FAILURE = "LOAD_POST_FAILURE";
+
 export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
 export const LOAD_POSTS_SUCCESS = "LOAD_POSTS_SUCCESS";
 export const LOAD_POSTS_FAILURE = "LOAD_POSTS_FAILURE";
@@ -185,13 +196,30 @@ const reducer = (state = initialState, action) =>
         draft.loadPostsError = null;
         draft.mainPosts = draft.mainPosts.concat(action.data);
         draft.hasMorePosts = action.data.length === 10;
-
         break;
       case LOAD_POSTS_FAILURE:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
         draft.loadPostsError = action.data;
         break;
+
+      case LOAD_POST_REQUEST:
+        draft.loadPostDone = false;
+        draft.loadPostLoading = true;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_SUCCESS:
+        draft.singlePost = action.data;
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.loadPostError = action.data;
+        break;
+
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
         draft.addPostDone = false;
