@@ -1,0 +1,12 @@
+{
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "babel-plugin-styled-components",
+      {
+        "ssr": true,
+        "displayNmame": true // 개발모드에서 외계어로 되어있는게 컴포넌트 이름으로 바껴서 보기 편해짐
+      }
+    ]
+  ]
+}
