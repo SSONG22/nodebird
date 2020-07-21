@@ -10,6 +10,7 @@ const path = require("path");
 const postRouter = require("./routes/post");
 const postsRouter = require("./routes/posts");
 const userRouter = require("./routes/user");
+const hashtagRouter = require("./routes/hashtag");
 const db = require("./models");
 const passportConfig = require("./passport");
 
@@ -52,6 +53,7 @@ app.get("/", (req, res) => {
 app.use("/post", postRouter); //중복된 것을 앞으로 빼줌 //prefix
 app.use("/posts", postsRouter);
 app.use("/user", userRouter);
+app.use("/hashtag", hashtagRouter);
 
 //기본적인 에러처리 미들웨어 변경
 // app.use((err, req, res, next) => {

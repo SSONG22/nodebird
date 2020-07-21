@@ -37,10 +37,15 @@ import {
   LOAD_POST_FAILURE,
   LOAD_POST_REQUEST,
   LOAD_POST_SUCCESS,
+  LOAD_USER_POSTS_REQUEST,
+  LOAD_USER_POSTS_FAILURE,
+  LOAD_USER_POSTS_SUCCESS,
+  LOAD_HASHTAG_POSTS_SUCCESS,
+  LOAD_HASHTAG_POSTS_FAILURE,
+  LOAD_HASHTAG_POSTS_REQUEST,
 } from "../reducers/post";
 import axios from "axios";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
-import shortid from "shortid";
 
 function loadPostAPI(data) {
   return axios.get(`/post/${data}`);
@@ -89,7 +94,51 @@ function* loadPosts(action) {
 function* watchLoadPosts() {
   yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
 }
+function loadUserPostsAPI(lastId, data) {
+  return axios.get(`/user/${data}/posts?lastId=${lastId || 0}`);
+}
+function* loadUserPosts(action) {
+  try {
+    const result = yield call(loadUserPostsAPI, action.lastId, action.data);
+    yield put({
+      type: LOAD_USER_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: LOAD_USER_POSTS_FAILURE,
+      data: error.response.data,
+    });
+  }
+}
+function* watchLoadUserPosts() {
+  yield throttle(5000, LOAD_USER_POSTS_REQUEST, loadUserPosts);
+}
 
+function loadHashtagPostsAPI(lastId, data) {
+  return axios.get(
+    `/hashtag/${encodeURIComponent(data)}?lastId=${lastId || 0}`,
+  );
+}
+function* loadHashtagPosts(action) {
+  try {
+    console.log("hashtag", action.lastId, action.data);
+    const result = yield call(loadHashtagPostsAPI, action.lastId, action.data);
+    yield put({
+      type: LOAD_HASHTAG_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    console.error(error);
+    yield put({
+      type: LOAD_HASHTAG_POSTS_FAILURE,
+      data: error.response.data,
+    });
+  }
+}
+function* watchLoadHashtagPosts() {
+  yield throttle(5000, LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
+}
 function addPostAPI(data) {
   return axios.post("http://localhost:3065/post", data);
 }
@@ -258,6 +307,8 @@ export default function* postSaga() {
     fork(watchAddComment),
     fork(watchRemovePost),
     fork(watchLoadPosts),
+    fork(watchLoadUserPosts),
+    fork(watchLoadHashtagPosts),
     fork(watchLoadPost),
     fork(watchLikePost),
     fork(watchUnlikePost),

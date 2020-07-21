@@ -1,5 +1,5 @@
 /* eslint-disable import/no-useless-path-segments */
-import React from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { useSelector } from "react-redux";
@@ -8,13 +8,21 @@ import styled from "styled-components";
 
 import UserProfile from "../components/UserProfile";
 import LoginForm from "../components/LoginForm";
+import useInput from "../hooks/useInput";
+import Router from "next/router";
 
-const CustomView = styled(Input.Search)`
+const SearchInput = styled(Input.Search)`
   verticalalign: middle;
 `;
 
 const AppLayout = ({ children }) => {
+  const [searchInput, onChangeSearchInput] = useInput("");
   const { me } = useSelector((state) => state.user);
+
+  const onSearch = useCallback(() => {
+    Router.push(`/hashtag/${searchInput}`);
+  }, [searchInput]);
+
   return (
     <div>
       <Menu mode="horizontal">
@@ -29,7 +37,12 @@ const AppLayout = ({ children }) => {
           </Link>
         </Menu.Item>
         <Menu.Item>
-          <CustomView />
+          <SearchInput
+            enterButton
+            value={searchInput}
+            onChange={onChangeSearchInput}
+            onSearch={onSearch}
+          />
         </Menu.Item>
         <Menu.Item>
           <Link href="/signup">
