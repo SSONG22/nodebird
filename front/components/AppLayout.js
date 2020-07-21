@@ -59,7 +59,7 @@ const AppLayout = ({ children }) => {
         </Col>
         <Col xs={24} md={6}>
           <a
-            href="https://www.zerocho.com"
+            href="https://github.com/SSONG22/nodebird/"
             target="_blank"
             rel="noreferrer noopener"
           >

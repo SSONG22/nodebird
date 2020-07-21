@@ -2,7 +2,6 @@
 /* eslint-disable no-case-declarations */
 import shortId from "shortid";
 import produce from "immer";
-import faker from "faker";
 
 export const initialState = {
   mainPosts: [],
@@ -37,6 +36,10 @@ export const initialState = {
   removePostLoading: false,
   removePostDone: false,
   removePostError: null,
+
+  updatePostLoading: false,
+  updatePostDone: false,
+  updatePostError: null,
 
   likePostLoading: false,
   likePostDone: false,
@@ -110,6 +113,10 @@ export const ADD_COMMENT_FAILURE = "ADD_COMMENT_FAILURE";
 export const REMOVE_POST_REQUEST = "REMOVE_POST_REQUEST";
 export const REMOVE_POST_SUCCESS = "REMOVE_POST_SUCCESS";
 export const REMOVE_POST_FAILURE = "REMOVE_POST_FAILURE";
+
+export const UPDATE_POST_REQUEST = "UPDATE_POST_REQUEST";
+export const UPDATE_POST_SUCCESS = "UPDATE_POST_SUCCESS";
+export const UPDATE_POST_FAILURE = "UPDATE_POST_FAILURE";
 
 export const LIKE_POST_REQUEST = "LIKE_POST_REQUEST";
 export const LIKE_POST_SUCCESS = "LIKE_POST_SUCCESS";
@@ -259,6 +266,7 @@ const reducer = (state = initialState, action) =>
         draft.addPostDone = true;
         draft.addPostError = action.data;
         break;
+
       case REMOVE_POST_REQUEST:
         draft.removePostLoading = true;
         draft.removePostDone = false;
@@ -277,6 +285,23 @@ const reducer = (state = initialState, action) =>
         draft.removePostDone = true;
         draft.removePostError = action.data;
         break;
+
+      case UPDATE_POST_REQUEST:
+        draft.updatePostLoading = true;
+        draft.updatePostDone = false;
+        draft.updatePostError = null;
+        break;
+      case UPDATE_POST_SUCCESS:
+        draft.updatePostLoading = false;
+        draft.updatePostDone = true;
+        draft.updatePostError = null;
+        break;
+      case UPDATE_POST_FAILURE:
+        draft.updatePostLoading = false;
+        draft.updatePostDone = true;
+        draft.updatePostError = action.data;
+        break;
+
       case ADD_COMMENT_REQUEST:
         draft.addCommentLoading = true;
         draft.addCommentDone = false;

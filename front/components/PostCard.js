@@ -22,6 +22,9 @@ import {
   RETWEET_REQUEST,
 } from "../reducers/post";
 import Link from "next/link";
+import moment from "moment";
+
+moment.locale("ko");
 
 const PostCard = ({ post }) => {
   // console.log("dd", post);
@@ -117,6 +120,10 @@ const PostCard = ({ post }) => {
           post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다` : null
         }
       >
+        <div style={{ float: "right" }}>
+          {moment(post.createdAt).format("MM월 DD일")}
+        </div>
+
         {post.RetweetId && post.Retweet ? (
           <Card
             cover={
@@ -125,6 +132,10 @@ const PostCard = ({ post }) => {
               )
             }
           >
+            <div style={{ float: "right" }}>
+              {moment(post.createdAt).format("MM월 DD일")}
+            </div>
+
             <Card.Meta
               avatar={
                 <Link href={`/user/${post.Retweet.User.id}`}>
