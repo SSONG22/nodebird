@@ -43,6 +43,10 @@ import {
   LOAD_HASHTAG_POSTS_SUCCESS,
   LOAD_HASHTAG_POSTS_FAILURE,
   LOAD_HASHTAG_POSTS_REQUEST,
+  UPDATE_POST_REQUEST,
+  UPDATE_POST_FAILURE,
+  REMOVE_IMAGE,
+  UPDATE_POST_SUCCESS,
 } from "../reducers/post";
 import axios from "axios";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
@@ -164,31 +168,71 @@ function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
 
-function removePostAPI(data) {
-  return axios.delete(`/post/${data}`);
+function removePostAPI(id) {
+  return axios.delete(`/post/${id}`);
 }
 function* removePost(action) {
   try {
     const result = yield call(removePostAPI, action.data);
-    console.log(result.data);
+
     yield put({
       type: REMOVE_POST_OF_ME,
       data: result.data,
     });
-    // const result = yield call(addPostAPI, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
       data: result.data,
     });
-  } catch (err) {
+  } catch (error) {
     yield put({
       type: REMOVE_POST_FAILURE,
-      data: err.response.data,
+      data: error.response.data,
     });
   }
 }
 function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
+}
+
+function updatePostAPI(id, data) {
+  console.log(data);
+  return axios.put(`/post/${id}`, data).catch(function (error) {
+    if (error.response) {
+      // 요청이 이루어졌으며 서버가 2xx의 범위를 벗어나는 상태 코드로 응답했습니다.
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // 요청이 이루어 졌으나 응답을 받지 못했습니다.
+      // `error.request`는 브라우저의 XMLHttpRequest 인스턴스 또는
+      // Node.js의 http.ClientRequest 인스턴스입니다.
+      console.log(error.request);
+    } else {
+      // 오류를 발생시킨 요청을 설정하는 중에 문제가 발생했습니다.
+      console.log("Error", error.message);
+    }
+    console.log(error.config);
+  });
+}
+
+function* updatePost(action) {
+  try {
+    console.log(action.id, action.data);
+    const result = yield call(updatePostAPI, action.id, action.data);
+    console.log(result);
+    yield put({
+      type: UPDATE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (error) {
+    yield put({
+      type: UPDATE_POST_FAILURE,
+      data: error.response.data,
+    });
+  }
+}
+function* watchUpdatePost() {
+  yield takeLatest(UPDATE_POST_REQUEST, updatePost);
 }
 
 function addCommentAPI(data) {
@@ -306,6 +350,7 @@ export default function* postSaga() {
     fork(watchAddPost),
     fork(watchAddComment),
     fork(watchRemovePost),
+    fork(watchUpdatePost),
     fork(watchLoadPosts),
     fork(watchLoadUserPosts),
     fork(watchLoadHashtagPosts),

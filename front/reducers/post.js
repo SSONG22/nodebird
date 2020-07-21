@@ -292,6 +292,9 @@ const reducer = (state = initialState, action) =>
         draft.updatePostError = null;
         break;
       case UPDATE_POST_SUCCESS:
+        // draft.singlePost = action.data;
+        const index = draft.mainPosts.findIndex((v) => v.id === action.data.id);
+        draft.mainPosts[index] = action.data;
         draft.updatePostLoading = false;
         draft.updatePostDone = true;
         draft.updatePostError = null;
@@ -313,7 +316,6 @@ const reducer = (state = initialState, action) =>
         draft.addCommentError = null;
         const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
         post.Comments.unshift(action.data);
-        // post.Comments.unshift(dummyComment(action.data.content));
         break;
       }
       case ADD_COMMENT_FAILURE:

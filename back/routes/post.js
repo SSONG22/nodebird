@@ -33,7 +33,9 @@ const upload = multer({
 //post가 공통적
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   //POST / post
+
   try {
+    console.log(req.body);
     const hashtags = req.body.content.match(/#[^\s]+/g);
     const post = await Post.create({
       content: req.body.content,
@@ -103,6 +105,92 @@ router.delete("/:postId", isLoggedIn, async (req, res, next) => {
       where: { id: req.params.postId },
     });
     res.status(200).json({ PostId: parseInt(req.params.postId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+router.put("/:postId", isLoggedIn, async (req, res, next) => {
+  //PUT /post/1
+  try {
+    console.log(req.params.postId);
+    const hashtags = req.body.content.match(/#[^\s]+/g);
+    const post = await Post.update(
+      {
+        content: req.body.content,
+      },
+      {
+        where: { id: req.params.postId },
+      }
+    );
+
+    console.log(post, "adasdasdasda");
+    if (hashtags) {
+      const result = await Promise.all(
+        hashtags.map((tag) =>
+          Hashtag.findOrCreate({
+            where: { name: tag.slice(1).toLowerCase() }, // 소문자 저장
+          })
+        )
+      );
+      await post.addHashtags(result.map((v) => v[0])); // 첫번째 배열만 추출
+    }
+    if (req.body.image) {
+      if (Array.isArray(req.body.image)) {
+        // 이미지를 여러 개 올리면 image: [1.png, 2.png]
+        const images = await Promise.all(
+          req.body.image.map((image) => Image.create({ src: image }))
+        );
+        await post.addImages(images);
+      } else {
+        // 이미지를 하나만 올리면 image : 1.png
+        const image = await Image.create({ src: req.body.image });
+        await post.addImages(image);
+      }
+    }
+
+    const fullPost = await Post.findOne({
+      where: { id: req.params.postId },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "nickname"],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "Likers",
+          attributes: ["id", "nickname"],
+        },
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+      ],
+    });
+
+    console.log(fullPost);
+    res.status(200).json(fullPost);
   } catch (error) {
     console.error(error);
     next(error);

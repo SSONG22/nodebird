@@ -23,17 +23,21 @@ import {
 } from "../reducers/post";
 import Link from "next/link";
 import moment from "moment";
+import PostForm from "./PostForm";
 
 moment.locale("ko");
 
 const PostCard = ({ post }) => {
   // console.log("dd", post);
   const dispatch = useDispatch();
-  const { removePostLoading } = useSelector((state) => state.post);
+  const { removePostLoading, updatePostLoading } = useSelector(
+    (state) => state.post,
+  );
   const { me } = useSelector((state) => state.user);
   const id = me?.id; // new!! optional changin 연산자
   // const id = useSelector ((state)=>state.user.me?.id);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
+  const [updateForm, setUpdateForm] = useState(false);
 
   const onLike = useCallback(() => {
     if (!id) {
@@ -44,6 +48,7 @@ const PostCard = ({ post }) => {
       data: post.id,
     });
   }, [post]);
+
   const onUnLike = useCallback(() => {
     if (!id) {
       return alert("로그인해주세요");
@@ -75,6 +80,10 @@ const PostCard = ({ post }) => {
     });
   }, [post]);
 
+  const onClickUpdate = () => {
+    setUpdateForm(!updateForm);
+  };
+
   const liked = post.Likers.find((v) => v.id === id);
 
   return (
@@ -99,7 +108,9 @@ const PostCard = ({ post }) => {
               <ButtonGroup>
                 {id && post.User.id && (
                   <>
-                    <Button>수정</Button>
+                    <Button loading={updatePostLoading} onClick={onClickUpdate}>
+                      수정
+                    </Button>
                     <Button
                       type="danger"
                       onClick={onRemovePost}
@@ -190,6 +201,14 @@ const PostCard = ({ post }) => {
           />
         </div>
       )}
+      {updateForm && (
+        <PostForm
+          postContent={post.content}
+          postImage={post.Images}
+          postId={post.id}
+          setUpdateForm={setUpdateForm}
+        />
+      )}
     </div>
   );
 };
@@ -199,7 +218,7 @@ PostCard.propTypes = {
     // shape 로 객체 구체화
     id: PropTypes.number,
     User: PropTypes.object,
-    contnet: PropTypes.string,
+    content: PropTypes.string,
     createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
