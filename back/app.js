@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === "production") {
 }
 app.use(
   cors({
-    origin: ["http://localhost:3060", "nodebird.com", "http://52.78.207.22"], //true 해도됨
+    origin: ["nodebird.com", "http://13.125.208.7"], //true 해도됨
     credentials: true,
   })
 );
@@ -68,6 +68,6 @@ app.use("/hashtag", hashtagRouter);
 // app.use((err, req, res, next) => {
 // });
 
-app.listen(3065, () => {
+app.listen(80, () => {
   console.log("서버실행중");
 });

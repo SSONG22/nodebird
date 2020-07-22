@@ -144,7 +144,7 @@ function* watchLoadHashtagPosts() {
   yield throttle(5000, LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
 }
 function addPostAPI(data) {
-  return axios.post("http://localhost:3065/post", data);
+  return axios.post("/post", data);
 }
 function* addPost(action) {
   try {
@@ -237,7 +237,7 @@ function* watchUpdatePost() {
 
 function addCommentAPI(data) {
   //POST /post/1/comment
-  return axios.post(`http://localhost:3065/post/${data.postId}/comment`, data, {
+  return axios.post(`/post/${data.postId}/comment`, data, {
     withCredentials: true,
   });
 }
