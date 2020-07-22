@@ -1,9 +1,12 @@
 .serverless
 /front/build
 server.pem
-node_modules
-.env
+/front/node_modules
 
+.env
+/front/.next
+.next
+/back/.env
 
 .cache
 
