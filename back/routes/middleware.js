@@ -1,4 +1,5 @@
 exports.isLoggedIn = (req, res, next) => {
+  console.log(req.isAuthenticated());
   if (req.isAuthenticated()) {
     next(); // 그냥 next 를 하면 다음 미들웨어로 가고, 안에 인자를 넣으면 에러를 처리함
   } else {
