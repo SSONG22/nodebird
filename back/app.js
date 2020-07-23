@@ -32,20 +32,21 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined")); //접속자의 ip 도 알 수 있다.
   app.use(hpp());
   app.use(helmet()); //걍 필수
+  app.use(
+    cors({
+      origin: "http://cheering99.shop", //true 해도됨
+      credentials: true,
+    })
+  );
 } else {
   app.use(morgan("dev"));
+  app.use(
+    cors({
+      origin: true,
+      credentials: true,
+    })
+  );
 }
-app.use(
-  cors({
-    origin: ["http://cheering99.shop"], //true 해도됨
-    credentials: true,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      domain: process.env.NODE_ENV === "production" && ".cheering.shop",
-    },
-  })
-);
 app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -55,6 +56,12 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET,
+
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      domain: ".cheering.shop",
+    },
   })
 );
 app.use(passport.initialize());
