@@ -39,6 +39,11 @@ app.use(
   cors({
     origin: ["http://cheering99.shop"], //true 해도됨
     credentials: true,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      domain: process.env.NODE_ENV === "production" && ".cheering.shop",
+    },
   })
 );
 app.use("/", express.static(path.join(__dirname, "uploads")));
