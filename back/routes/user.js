@@ -147,10 +147,12 @@ router.patch("/nickname", isLoggedIn, async (req, res, next) => {
 
 router.get("/followers", isLoggedIn, async (req, res, next) => {
   //GET user/followers
+  console.log("followers!!!!!!! ");
   try {
     const user = await User.findOne({
       where: { id: req.user.id },
     });
+    console.log(user, "!!!!!!followers");
     if (!user) {
       return res.status(403).send("존재하지 않는 사람입니다.");
     }
