@@ -21,6 +21,7 @@ exports.handler = async (event, context, callback) => {
       .resize(400, 400, { fit: "inside" })
       .toFormat(requireFormat)
       .toBuffer();
+
     await s3
       .putObject({
         Bucket,
