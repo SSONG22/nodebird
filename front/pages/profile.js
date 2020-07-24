@@ -22,11 +22,11 @@ const Profile = () => {
   const [followingsLimit, setFollowingsLimit] = useState(3);
 
   const { data: followersData, error: followerError } = useSWR(
-    `${backUrl}/user/followers?limit=${followersLimit}`,
+    `${backUrl}user/followers?limit=${followersLimit}`,
     fetcher,
   );
   const { data: followingsData, error: followingError } = useSWR(
-    `${backUrl}/user/followings?limit=${followingsLimit}`,
+    `${backUrl}user/followings?limit=${followingsLimit}`,
     fetcher,
   );
 
